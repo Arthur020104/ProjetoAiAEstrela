@@ -2107,6 +2107,10 @@ PrefabInstance:
       propertyPath: _uiManager
       value: 
       objectReference: {fileID: 488307837}
+    - target: {fileID: 6573056380766149971, guid: 01256665d9ba55348ad5dc3f3f1f36ab, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

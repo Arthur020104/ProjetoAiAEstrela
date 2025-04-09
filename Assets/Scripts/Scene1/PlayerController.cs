@@ -1,12 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.InputSystem.Controls;
 
 public class PlayerController : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     [Header("ViewConfig")]
     [SerializeField]private Transform _viewPoint;
     [SerializeField]private float _mouseSensX = 10.0f, _mouseSensY = 10.0f, _clampVerticalRot = 60.0f;
@@ -14,46 +11,27 @@ public class PlayerController : MonoBehaviour
     private const float MOUSE_SENS_MULT = 100.0f;
     private float _verticalRotStore = 0.0f;
     private Vector2 _mouseInput;
-
     private Camera _cam;
-    [Header("MovementConfig")]
 
+    [Header("MovementConfig")]
     [SerializeField]private float _moveSpeed = 10.0f, _runMulti = 1.6f;
     private float _activeSpeed;
     private CharacterController _charCon;
-
     private Vector3 _move;
-    //[SerializeField]private float _jumpForce = 12.0f, _gravityMult = 2.5f;
-
-    [SerializeField]private Transform _groundCheckPoint;
-    private bool _isGrounded;
-    [SerializeField]private LayerMask _groundLayers;
-
-    [SerializeField] private float _rayLenght =  0.2f;
-
-    /*[Header("Shooting")]//placeHolder
-    [SerializeField]private GameObject _bulletImpact;
-    [SerializeField]private float _timeToDestroyBulletImpact = 5.0f;*/
 
     [Header("Resorces")]
-    [SerializeField]private GameObject _lantern;
-    [SerializeField]private float _flashTime = 0.3f;
-    private bool _lanternIsEnable = false;
-
     [SerializeField]private GameObject _trailPrefab;
+    [SerializeField]private float timeToSendTrail = 0.3f;
 
     [SerializeField]private int _itemCount = 0;
-
     [SerializeField]private LayerMask _itemInteractionLayer;
-
     [SerializeField]private float _pickupItemRadius = 1;
-    [SerializeField] private float timeToSendTrail = 0.3f;
+
     //IA
     private AI _AIScript;
     private MapGenerator _mapGen;
 
     [Header("Audio")]
-
     [SerializeField]private AudioSource _stepsSource;
     private Vector3 _lastPosition;
 
@@ -61,86 +39,57 @@ public class PlayerController : MonoBehaviour
     [SerializeField]private UIManager _uiManager;
 
     public bool _isFrozen = false;
+
     void Start()
     {
-        
-        this._cam = Camera.main;
-        if(this._cam == null)
-        {
+        _cam = Camera.main;
+        if(_cam == null) 
             Debug.LogError("Camera can't be null.");
-        }
-
-        if(this._viewPoint == null)
-        {
+        if(_viewPoint == null) 
             Debug.LogError("ViewPoint can't be null.");
-        }
-        if(!this.TryGetComponent<CharacterController>(out this._charCon))
-        {
+        if(!TryGetComponent<CharacterController>(out _charCon)) 
             Debug.LogError("Character needs to have CharacterController.");
-        }
         _AIScript = GameObject.FindAnyObjectByType<AI>();
-        if(_AIScript == null)
-        {
+        if(_AIScript == null) 
             Debug.LogError("Could not find the AI");
-        }
-        if(_lantern == null)
-        {
-            Debug.LogError("Lantern is null");
-        }
-        if(_trailPrefab == null)
-        {
-            Debug.LogError("Trail is null");
-        }
-        _mapGen = GameObject.FindAnyObjectByType<MapGenerator>();
-        if (_mapGen == null)
-        {
-            Debug.LogError("Could not find reference to map generator script");
-        }
-        if (_stepsSource == null)
-        {
-            Debug.LogError("StepsSource is null");
-        }
-        if(_uiManager == null)
-        {
-            Debug.LogError("uiManager is null");
-        }
         
-        _lastPosition = this.transform.position;
-        _lanternIsEnable = false;
-        _lantern.SetActive(false);
+        _mapGen = GameObject.FindAnyObjectByType<MapGenerator>();
+        if (_mapGen == null) 
+            Debug.LogError("Could not find reference to map generator script");
 
-        this._activeSpeed = this._moveSpeed;
+        if (_stepsSource == null) 
+            Debug.LogError("StepsSource is null");
+        if(_uiManager == null) 
+            Debug.LogError("uiManager is null");
+
+        _lastPosition = transform.position;
+        _activeSpeed = _moveSpeed;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if(_isFrozen)
         {
-            if(_stepsSource.enabled)
-                _stepsSource.enabled = false;
+            if(_stepsSource.enabled) _stepsSource.enabled = false;
             return;
         }
-        CheckGrounded();
         HandleCameraInput();
         HandleMovement();
-        HandleCursor();
 
+        // Command AI to move to player's position
         if(Input.GetKeyDown(KeyCode.F) && _AIScript != null)
         {
-            _AIScript.GoTo(new Vector2(Mathf.RoundToInt(gameObject.transform.position.x), Mathf.RoundToInt(gameObject.transform.position.z)));
+            _AIScript.GoTo(new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.z)));
             SpawnTrailsToTargets(_trailPrefab, transform.position);
-            //if(!_lanternIsEnable)
-              //  StartCoroutine(FlashLantern());
         }
+        
+        // Item pickup functionality
         if(Input.GetKeyDown(KeyCode.E))
         {
-            Collider[] items = Physics.OverlapSphere(gameObject.transform.position, _pickupItemRadius, _itemInteractionLayer);
-
+            Collider[] items = Physics.OverlapSphere(transform.position, _pickupItemRadius, _itemInteractionLayer);
             foreach(Collider item in items)
             {
-                //remove item position from items pos on mapgen
-                _mapGen.itemsPosition.Remove(new Vector2(Mathf.RoundToInt(item.gameObject.transform.position.x), Mathf.RoundToInt(item.gameObject.transform.position.z)));
+                _mapGen.itemsPosition.Remove(new Vector2(Mathf.RoundToInt(item.transform.position.x), Mathf.RoundToInt(item.transform.position.z)));
                 Destroy(item.gameObject);
                 _itemCount++;
                 Debug.Log($"Got item, item count: {_itemCount}");
@@ -148,18 +97,17 @@ public class PlayerController : MonoBehaviour
             }
         }
         HandleAudio();
-
     }
+
+    // Manages footstep sounds based on player movement speed
     void HandleAudio()
     {
-        //Not playing audio if is off the ground
-        Vector3 currentHorizontalPos = new Vector3(this.transform.position.x, 0.0f, this.transform.position.z);
+        Vector3 currentHorizontalPos = new Vector3(transform.position.x, 0.0f, transform.position.z);
         Vector3 lastPosHorizontal = new Vector3(_lastPosition.x, 0.0f, _lastPosition.z);
-        _lastPosition = this.transform.position;
+        _lastPosition = transform.position;
 
         float normalizedSpeed = ((currentHorizontalPos - lastPosHorizontal).magnitude / Time.deltaTime)/ _moveSpeed;
-        
-        if(normalizedSpeed > 0 && isGrounded())
+        if(normalizedSpeed > 0)
         {
             _stepsSource.enabled = true;
             _stepsSource.pitch = Mathf.Clamp(normalizedSpeed, 0.5f, 2.0f);
@@ -169,131 +117,67 @@ public class PlayerController : MonoBehaviour
             _stepsSource.enabled = false;
         }
     }
-    IEnumerator FlashLantern()
-    {
-        _lanternIsEnable = true;
-        _lantern.SetActive(true);
-        RenderSettings.fog = false;
-
-        yield return new WaitForSeconds(_flashTime);
-
-        _lanternIsEnable = false;
-        _lantern.SetActive(false);
-        RenderSettings.fog = true;
-    }
-    private static void HandleCursor()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Cursor.lockState = CursorLockMode.None;
-        }
-        else if (Cursor.lockState == CursorLockMode.None && Input.GetMouseButtonDown(0))
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-        }
-    }
-
     private void LateUpdate()
     {
         UpdateCameraPosition();
     }
-    /*private void Shoot()
-    {
-        Ray ray = this._cam.ViewportPointToRay(new Vector3(0.5f,0.5f,0.0f));
-        ray.origin = this._cam.transform.position;
 
-        if(Physics.Raycast(ray, out RaycastHit hit))
-        {
-            //Debug.Log(hit.collider.gameObject.name);
-            GameObject bulletImpactInstance = Instantiate(this._bulletImpact, hit.point + (hit.normal * 0.002f), Quaternion.LookRotation(hit.normal, Vector3.up));
-            Destroy(bulletImpactInstance, this._timeToDestroyBulletImpact);
-        }
-    }*/
+    // Controls player movement, including running with left shift
     private void HandleMovement()
     {
-        if(Input.GetKeyDown(KeyCode.LeftShift) )
-        {  
-            this._activeSpeed *= this._runMulti;
+        if(Input.GetKeyDown(KeyCode.LeftShift))
+        {
+            _activeSpeed *= _runMulti;
         }
         else if(Input.GetKeyUp(KeyCode.LeftShift))
         {
-            this._activeSpeed /= this._runMulti;
+            _activeSpeed /= _runMulti;
         }
-        //applying gravity using code to try using on my 3d(c++) lib
-        //maybe will be replaced using the rb
-        float yVel = this._move.y;
-        this._move = this._activeSpeed * (this.gameObject.transform.right * Input.GetAxisRaw("Horizontal") +  this.gameObject.transform.forward * Input.GetAxisRaw("Vertical")).normalized;
-        this._move.y = yVel;
-        
-        if(this._charCon.isGrounded)
-        {
-            this._move.y = 0.0f;
-        }
-        
-        /*if(this._isGrounded && Input.GetButtonDown("Jump"))
-        {
-            this._move.y = this._jumpForce;
-        }
+        float yVel = _move.y;
+        _move = _activeSpeed * (transform.right * Input.GetAxisRaw("Horizontal") + transform.forward * Input.GetAxisRaw("Vertical")).normalized;
+        _move.y = yVel;
 
-
-        this._move.y += Physics.gravity.y * this._gravityMult * Time.deltaTime;*/
-
-        
-        this._charCon.Move(this._move * Time.deltaTime);
-
+        if(_charCon.isGrounded) _move.y = 0.0f;
+        _charCon.Move(_move * Time.deltaTime);
     }
+
+    // Processes mouse input for first-person camera control
     private void HandleCameraInput()
     {
-        this._mouseInput = new Vector2(Input.GetAxisRaw("Mouse X") * this._mouseSensX, Input.GetAxisRaw("Mouse Y") * this._mouseSensY) * Time.deltaTime * MOUSE_SENS_MULT;
-        
-        //Applying horizontal rotation to the player and consequently to the ViewPoint, ViewPoint is a child(Inside unity) of the player GameObject
-        gameObject.transform.rotation = Quaternion.Euler(this.gameObject.transform.eulerAngles.x, this.gameObject.transform.eulerAngles.y + this._mouseInput.x, this.gameObject.transform.eulerAngles.z);
+        _mouseInput = new Vector2(Input.GetAxisRaw("Mouse X") * _mouseSensX, Input.GetAxisRaw("Mouse Y") * _mouseSensY) * Time.deltaTime * MOUSE_SENS_MULT;
+        transform.rotation = Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y + _mouseInput.x, transform.eulerAngles.z);
+        _verticalRotStore = Mathf.Clamp(_verticalRotStore + (_invertLook ? _mouseInput.y : -_mouseInput.y), -_clampVerticalRot, _clampVerticalRot);
+        _viewPoint.rotation = Quaternion.Euler(_verticalRotStore, _viewPoint.eulerAngles.y, _viewPoint.eulerAngles.z);
+    }
 
-        //Applying Vertical rotation only to the viewPoint, if player has head add some rotation to it
-        this._verticalRotStore = Mathf.Clamp(this._verticalRotStore + (this._invertLook ? this._mouseInput.y : -this._mouseInput.y), -this._clampVerticalRot,this._clampVerticalRot);
-
-        this._viewPoint.rotation = Quaternion.Euler(this._verticalRotStore,this._viewPoint.transform.eulerAngles.y, this._viewPoint.transform.eulerAngles.z);
-    }
-    private void CheckGrounded()
-    {
-        this._isGrounded = Physics.Raycast(this._groundCheckPoint.transform.position, -this.transform.up, this._rayLenght, this._groundLayers);
-    }
-    private bool isGrounded()
-    {
-        return this._isGrounded;
-    }
+    // Syncs the camera position and rotation with the view point
     private void UpdateCameraPosition()
     {
-        this._cam.transform.position = this._viewPoint.position;
-        this._cam.transform.rotation = this._viewPoint.rotation;
+        _cam.transform.position = _viewPoint.position;
+        _cam.transform.rotation = _viewPoint.rotation;
     }
 
-
-
+    // Creates trails from current position to all item positions on the map
     public void SpawnTrailsToTargets(GameObject prefab, Vector3 pos)
     {
-        //StartCoroutine(StartTrailsAndSend(prefab, pos));
         List<Vector2> targets = _mapGen.itemsPosition;
         float timeToSend = Time.time + timeToSendTrail;
-
         for (int i = 0; i < targets.Count; i++)
         {
-            StartCoroutine(SendTrail(prefab, pos,targets[i], timeToSend));
+            StartCoroutine(SendTrail(prefab, pos, targets[i], timeToSend));
         }
     }
 
+    // Coroutine to animate a trail to a specific target position
     IEnumerator SendTrail(GameObject prefab, Vector3 pos, Vector2 target, float time)
     {
         GameObject instance = Instantiate(prefab, pos, Quaternion.identity);
-        
         if (!instance.TryGetComponent<Trail>(out Trail trailScript))
         {
             Debug.LogError("Could not find trail script on prefab");
             yield break;
         }
-        yield return new WaitForSeconds(time-Time.time);
-        //Debug.Log($"Sending trail to target {target}");
+        yield return new WaitForSeconds(time - Time.time);
         trailScript.GoTo(target);
-        
     }
 }

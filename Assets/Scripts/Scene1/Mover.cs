@@ -27,11 +27,7 @@ public class Mover : MonoBehaviour
         lasTTargetPosition = new Vector2(transform.position.x, transform.position.z);
         _movingTowards = lasTTargetPosition;
     }
-    protected virtual void  Start()
-    {
-        
-    }
-
+    protected virtual void Start(){}
     protected virtual void Update()
     {
         MovingTowards();
@@ -47,7 +43,7 @@ public class Mover : MonoBehaviour
         }
         Vector2 position2d = new Vector2(transform.position.x, transform.position.z);
 
-        // If _movingTowards is not set (default(Vector2)) or we've reached the target, set the next waypoint
+        // If _movingTowards is not set (default(Vector2)) or we have reached the target, set the next waypoint
         if (_movingTowards == new Vector2(-1,-1) || HasReachedTarget())
         {
             if (_path.Count == 0)
@@ -70,7 +66,7 @@ public class Mover : MonoBehaviour
     public bool HasReachedTarget()
     {
         Vector2 currentPosition = new Vector2(transform.position.x, transform.position.z);
-        return CalculateDistance(currentPosition, _movingTowards) <= _minDistanceToPos;
+        return Vector2.Distance(currentPosition, _movingTowards) <= _minDistanceToPos;
     }
     public virtual void GoTo(Vector2 destination)
     {
@@ -104,13 +100,5 @@ public class Mover : MonoBehaviour
             destination.y = Random.Range(0, _mapGen.gridHeight);
         } while (_mapGen.IsBlocked(Mathf.RoundToInt(destination.x), Mathf.RoundToInt(destination.y)));
         GoTo(destination);
-    }
-
-    float CalculateDistance(Vector2 a, Vector2 b)
-    {
-        // You could also use Vector2.Distance(a, b)
-        float x = a.x - b.x;
-        float y = a.y - b.y;
-        return Mathf.Sqrt(x * x + y * y);
     }
 }
