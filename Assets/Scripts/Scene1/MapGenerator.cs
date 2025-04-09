@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Linq;
 
 
-public class MapGenerator : MonoBehaviour // Possibly can be renamed to MapManager
+public class MapGenerator : MonoBehaviour
 {
     public int gridWidth, gridHeight; // Using Cartesian coordinates: width (X) and height (Y)
     [SerializeField] private GameObject defaultWallPrefab, itemsPrefab;
@@ -31,58 +31,76 @@ public class MapGenerator : MonoBehaviour // Possibly can be renamed to MapManag
     
     void Awake()
     {
-       if(_playerTransform == null || _enemyTransform == null)
+        if (_playerTransform == null || _enemyTransform == null)
         {
             Debug.LogError("Player or Enemy Transform are not assigned in the Inspector.");
         }
-        noSpawnPositionsSet.UnionWith(noSpawnPositionsArray);
-        noSpawnPositionsSet.Add(_playerTransform.position); 
-        noSpawnPositionsSet.Add(_enemyTransform.position);
-        
-        Vector2 playerV2Pos = new Vector2(Mathf.RoundToInt(_playerTransform.position.x), Mathf.RoundToInt(_playerTransform.position.z));
-        //make sure enemy has path to player
-        GeneratePath(playerV2Pos,new Vector2(Mathf.RoundToInt(_enemyTransform.position.x), Mathf.RoundToInt(_enemyTransform.position.z)));
-        GeneratePath(playerV2Pos, new Vector2(Mathf.RoundToInt(_portalTransform.position.x+1), Mathf.RoundToInt(_portalTransform.position.z)));
-        defaultWallSize = GetGameObjectPrefabSize(defaultWallPrefab);
-        
-        GenerateFakeGoals(playerV2Pos);
-        
 
+        InitializeNoSpawnPositions();
+
+        Vector2 playerV2Pos = new Vector2(Mathf.RoundToInt(_playerTransform.position.x), Mathf.RoundToInt(_playerTransform.position.z));
+
+        // Ensure paths for enemy and portal
+        GenerateRequiredPaths(playerV2Pos);
+
+        // Get wall size and generate goals
+        defaultWallSize = GetGameObjectPrefabSize(defaultWallPrefab);
+        GenerateFakeGoals(playerV2Pos);
+
+        // Initialize map grid
         mapGrid = new GameObject[gridWidth][];
         for (int i = 0; i < gridWidth; i++)
         {
             mapGrid[i] = new GameObject[gridHeight];
         }
+
         GenerateGrid();
         _mapCreated = true;
         OptimizeMap();
-         //Generate items
+
+        // Generate items
         itemsPosition = new List<Vector2>();
+        GameObject itemContainer = new GameObject { name = "Item Container" };
+        GenerateItems(playerV2Pos, itemContainer);
+    }
+    private void InitializeNoSpawnPositions()
+    {
+        noSpawnPositionsSet.UnionWith(noSpawnPositionsArray);
+        noSpawnPositionsSet.Add(_playerTransform.position);
+        noSpawnPositionsSet.Add(_enemyTransform.position);
+    }
 
-        GameObject itemContainer = new GameObject();
-        itemContainer.name = "Item Container";
+    private void GenerateRequiredPaths(Vector2 playerV2Pos)
+    {
+        GeneratePath(playerV2Pos, new Vector2(Mathf.RoundToInt(_enemyTransform.position.x), Mathf.RoundToInt(_enemyTransform.position.z)));
+        GeneratePath(playerV2Pos, new Vector2( Mathf.RoundToInt(_portalTransform.position.x + 1), Mathf.RoundToInt(_portalTransform.position.z)));
+    }
 
-        for(int i =0;i<_amountOfItems;i++)
+    private void GenerateItems(Vector2 playerV2Pos, GameObject itemContainer)
+    {
+        for(int i = 0; i < _amountOfItems; i++)
         {
             Vector2 itemPos;
             Stack<(int, int)> pathToPlayer;
             Vector3 itemPosv3;
+
             do
             {
-                itemPos = new Vector2(Random.Range((int)1, (int)gridWidth - 1), Random.Range(1, (int)gridHeight - 1));
-                pathToPlayer = AStar.AStarPathfinding(playerV2Pos, itemPos, this);//Should get player current position but 0,0 is default so using it for now
+                itemPos = new Vector2(
+                    Random.Range((int)1, (int)gridWidth - 1),
+                    Random.Range(1, (int)gridHeight - 1)
+                );
+                pathToPlayer = AStar.AStarPathfinding(playerV2Pos, itemPos, this);
                 itemPosv3 = new Vector3(itemPos.x, wallYPosition, itemPos.y);
             }
-            while(IsBlocked((int)itemPos.x, (int)itemPos.y) || pathToPlayer==null ||
-                pathToPlayer.Count <= 0 || noSpawnPositionsArray.Contains(itemPosv3) ||
-                itemPosv3 == _enemyTransform.position || itemPos == playerV2Pos);
+            while (IsBlocked((int)itemPos.x, (int)itemPos.y) || pathToPlayer == null || pathToPlayer.Count <= 0 || noSpawnPositionsArray.Contains(itemPosv3)
+                || itemPosv3 == _enemyTransform.position || itemPos == playerV2Pos);
 
             mapGrid[(int)itemPos.x][(int)itemPos.y] = Instantiate(itemsPrefab, new Vector3(itemPos.x, itemsPrefab.transform.position.y, itemPos.y), Quaternion.identity);
-            
+
             mapGrid[(int)itemPos.x][(int)itemPos.y].transform.parent = itemContainer.transform;
             itemsPosition.Add(itemPos);
         }
-        
     }
 
     void Update()
@@ -177,11 +195,11 @@ public class MapGenerator : MonoBehaviour // Possibly can be renamed to MapManag
             return true;
         }
 
-        //if map not created, for generating path to items and fake paths
+
         if(!_mapCreated)
             return false;
 
-        // If the cell is not null, its considered blocked and not item
+        // If the cell is not null and its not item, its considered blocked
         return mapGrid[x][y] != null && !mapGrid[x][y].CompareTag("Item");
     }
 
@@ -222,8 +240,6 @@ public class MapGenerator : MonoBehaviour // Possibly can be renamed to MapManag
         }
 
         // Computes the largest rectangle in the histogram represented by heights
-        // currentRow is the bottom row of the rectangle.
-        // Returns a tuple (minPosX, maxPosX, minPosY, maxPosY, area)
         (int minPosX, int maxPosX, int minPosY, int maxPosY, int area) LargestRectangleArea(int[] heights, int currentRow)
         {
             int n = heights.Length;
@@ -273,17 +289,13 @@ public class MapGenerator : MonoBehaviour // Possibly can be renamed to MapManag
             return bestResult;
         }
 
-        // --- Compute and paint the maximal rectangle ---
-        // Convert mapGrid into a row-major bool[][] matrix.
-        // We assume mapGrid is indexed as mapGrid[x][y], with x from 0 to gridWidth-1 and y from 0 to gridHeight-1.
-        // For the algorithm, we need a matrix where each row corresponds to a y coordinate.
+        // Compute and replace by max retangle
         bool[][] occupancyMatrix = new bool[gridHeight][];
         for (int y = 0; y < gridHeight; y++)
         {
             occupancyMatrix[y] = new bool[gridWidth];
             for (int x = 0; x < gridWidth; x++)
             {
-                // A cell is considered occupied (true) if mapGrid[x][y] is not null.
                 occupancyMatrix[y][x] = mapGrid[x][y] != null;
             }
         }
@@ -315,11 +327,7 @@ public class MapGenerator : MonoBehaviour // Possibly can be renamed to MapManag
             Vector3 scaledWallScale = new Vector3(originalScale.x * (distanceX + 1), originalScale.y, originalScale.z * (distanceY + 1));
             defaultWallPrefab.transform.localScale = scaledWallScale;
            
-            GameObject scaledWall = Instantiate(
-                defaultWallPrefab,
-                new Vector3(rectangle.minPosX + distanceX / 2f, wallYPosition, rectangle.minPosY + distanceY / 2f),
-                Quaternion.identity
-            );
+            GameObject scaledWall = Instantiate( defaultWallPrefab, new Vector3(rectangle.minPosX + distanceX / 2f, wallYPosition, rectangle.minPosY + distanceY / 2f), Quaternion.identity);
             scaledWall.transform.parent = newWallContainer.transform;
 
             // Adjust the materials texture scale to avoid stretching.

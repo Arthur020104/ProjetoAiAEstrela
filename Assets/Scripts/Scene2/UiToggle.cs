@@ -34,7 +34,7 @@ public class UiToggle : MonoBehaviour
     }
     public void ReStartGame()
     {
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("MainScene");
     }
     public void QuitGame()
     {

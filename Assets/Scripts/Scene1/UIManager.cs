@@ -82,7 +82,7 @@ public class UIManager : MonoBehaviour
         {
             return;
         }
-        SceneManager.LoadScene("SampleScene");
+        SceneManager.LoadScene("MainScene");
     }
     private void PopUpQueue()
     {
