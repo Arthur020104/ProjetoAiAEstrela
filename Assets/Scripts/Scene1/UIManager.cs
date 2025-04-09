@@ -97,9 +97,8 @@ public class UIManager : MonoBehaviour
         _itemCountField.text = $"{playerItems}/{_amountOfItems}";
         if(playerItems == _amountOfItems)
         {
-            Debug.Log("Player won, open portal");
             _portal.SetActive(true);
-            //Tell game Manager PLayer won and open a portal that will make a loud initial sound, and will keep imiting sound while use ist in it
+            ShowText("Portal aberto, siga o som para poder escapar.");
         }
     }
 

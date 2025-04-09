@@ -380,7 +380,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveSpeed: 7
   _minDistanceToPos: 0.2
-  _timeToStartMoving: 10
+  _timeToStartMoving: 20
   _delayBeforeRandomMove: 1.5
   _timeToDisregardPlayerPosition: 60
   _maxDistanceToWalkFromLastSawPos: 20
@@ -945,21 +945,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4159761510987481964, guid: e3956a892d61ec74fb363d0d79e7a241, type: 3}
       propertyPath: '_inicialText.Array.data[0]'
-      value: Use WASD para se movimentar e use o Mouse para olhar em volta.
+      value: Use WASD para se movimentar, segure SHIFT para correr e use o mouse
+        para olhar em volta.
       objectReference: {fileID: 0}
     - target: {fileID: 4159761510987481964, guid: e3956a892d61ec74fb363d0d79e7a241, type: 3}
       propertyPath: '_inicialText.Array.data[1]'
-      value: Para vencer, colete todos os itens espalhados pelo mapa sem ser capturado.
+      value: ' Apertando E, voce pode coletar os itens. Para vencer, colete todos
+        os itens espalhados pelo mapa sem ser capturado.'
       objectReference: {fileID: 0}
     - target: {fileID: 4159761510987481964, guid: e3956a892d61ec74fb363d0d79e7a241, type: 3}
       propertyPath: '_inicialText.Array.data[2]'
-      value: ' Pressione F para ativar uma habilidade especial que revela a localizacao
+      value: 'Pressione F para ativar uma habilidade especial que revela a localizacao
         de todos os itens, mas atencao: isso tambem revela sua posicao para o monstro.
         Use com cautela!'
       objectReference: {fileID: 0}
     - target: {fileID: 4159761510987481964, guid: e3956a892d61ec74fb363d0d79e7a241, type: 3}
+      propertyPath: _popupCharacterDisplayInterval
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 4159761510987481964, guid: e3956a892d61ec74fb363d0d79e7a241, type: 3}
       propertyPath: _durationBeforePopUpTextDestroy
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4186220446637533389, guid: e3956a892d61ec74fb363d0d79e7a241, type: 3}
       propertyPath: m_text
@@ -1446,7 +1452,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cd168308bb5e5e947ade0a14a044ba02, type: 2}
+  - {fileID: 2100000, guid: 3e3fc964d3563984bae410f09ed51294, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

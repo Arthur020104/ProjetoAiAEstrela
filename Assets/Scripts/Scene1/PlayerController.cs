@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController _charCon;
 
     private Vector3 _move;
-    [SerializeField]private float _jumpForce = 12.0f, _gravityMult = 2.5f;
+    //[SerializeField]private float _jumpForce = 12.0f, _gravityMult = 2.5f;
 
     [SerializeField]private Transform _groundCheckPoint;
     private bool _isGrounded;
@@ -31,9 +31,9 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float _rayLenght =  0.2f;
 
-    //[Header("Shooting")]//placeHolder
+    /*[Header("Shooting")]//placeHolder
     [SerializeField]private GameObject _bulletImpact;
-    [SerializeField]private float _timeToDestroyBulletImpact = 5.0f;
+    [SerializeField]private float _timeToDestroyBulletImpact = 5.0f;*/
 
     [Header("Resorces")]
     [SerializeField]private GameObject _lantern;
@@ -197,7 +197,7 @@ public class PlayerController : MonoBehaviour
     {
         UpdateCameraPosition();
     }
-    private void Shoot()
+    /*private void Shoot()
     {
         Ray ray = this._cam.ViewportPointToRay(new Vector3(0.5f,0.5f,0.0f));
         ray.origin = this._cam.transform.position;
@@ -208,7 +208,7 @@ public class PlayerController : MonoBehaviour
             GameObject bulletImpactInstance = Instantiate(this._bulletImpact, hit.point + (hit.normal * 0.002f), Quaternion.LookRotation(hit.normal, Vector3.up));
             Destroy(bulletImpactInstance, this._timeToDestroyBulletImpact);
         }
-    }
+    }*/
     private void HandleMovement()
     {
         if(Input.GetKeyDown(KeyCode.LeftShift) )
@@ -230,13 +230,13 @@ public class PlayerController : MonoBehaviour
             this._move.y = 0.0f;
         }
         
-        if(this._isGrounded && Input.GetButtonDown("Jump"))
+        /*if(this._isGrounded && Input.GetButtonDown("Jump"))
         {
             this._move.y = this._jumpForce;
         }
 
 
-        this._move.y += Physics.gravity.y * this._gravityMult * Time.deltaTime;
+        this._move.y += Physics.gravity.y * this._gravityMult * Time.deltaTime;*/
 
         
         this._charCon.Move(this._move * Time.deltaTime);
