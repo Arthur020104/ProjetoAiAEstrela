@@ -27,7 +27,7 @@ public class MapGenerator : MonoBehaviour // Possibly can be renamed to MapManag
     }
     private bool _mapCreated = false;
 
-    [SerializeField]private Transform _playerTransform, _enemyTransform;
+    [SerializeField]private Transform _playerTransform, _enemyTransform, _portalTransform;
     
     void Awake()
     {
@@ -42,6 +42,7 @@ public class MapGenerator : MonoBehaviour // Possibly can be renamed to MapManag
         Vector2 playerV2Pos = new Vector2(Mathf.RoundToInt(_playerTransform.position.x), Mathf.RoundToInt(_playerTransform.position.z));
         //make sure enemy has path to player
         GeneratePath(playerV2Pos,new Vector2(Mathf.RoundToInt(_enemyTransform.position.x), Mathf.RoundToInt(_enemyTransform.position.z)));
+        GeneratePath(playerV2Pos, new Vector2(Mathf.RoundToInt(_portalTransform.position.x+1), Mathf.RoundToInt(_portalTransform.position.z)));
         defaultWallSize = GetGameObjectPrefabSize(defaultWallPrefab);
         
         GenerateFakeGoals(playerV2Pos);
@@ -74,7 +75,7 @@ public class MapGenerator : MonoBehaviour // Possibly can be renamed to MapManag
             }
             while(IsBlocked((int)itemPos.x, (int)itemPos.y) || pathToPlayer==null ||
                 pathToPlayer.Count <= 0 || noSpawnPositionsArray.Contains(itemPosv3) ||
-                itemPosv3 == _enemyTransform.position || itemPosv3 == _playerTransform.position );
+                itemPosv3 == _enemyTransform.position || itemPos == playerV2Pos);
 
             mapGrid[(int)itemPos.x][(int)itemPos.y] = Instantiate(itemsPrefab, new Vector3(itemPos.x, itemsPrefab.transform.position.y, itemPos.y), Quaternion.identity);
             

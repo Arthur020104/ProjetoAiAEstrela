@@ -46,6 +46,8 @@ public class AI : Mover
     [SerializeField] private AudioSource _stepsSound;
     [SerializeField] private float _baseSpeedSound = 2.0f;
 
+    [Header("UI")]
+    [SerializeField] private UIManager _uiManager;
 
 
     private Quaternion _lastHeadRotation;
@@ -59,6 +61,10 @@ public class AI : Mover
         if (_animator == null)
         {
             Debug.LogError("Animator not assigned in inspector");
+        }
+        if(_uiManager == null)
+        {
+            Debug.LogError("uiManager not assigned in inspector");
         }
         _lastHeadRotation = Quaternion.identity;
         _audioSourceLaugh.enabled = false;
@@ -176,7 +182,16 @@ public class AI : Mover
 
                 if(Vector3.Distance(_playerPos.position, transform.position) <= _killPlayerDistance)
                 {
-                    Destroy(hit.collider.gameObject);
+                    _stepsSound.enabled = false;
+                    _animator.enabled = false;
+                    hit.collider.GetComponent<PlayerController>().enabled = false;
+                    hit.collider.GetComponent<AudioSource>().enabled = false;
+                    
+                    
+                    _isFrozen = true;
+                    
+                    _uiManager.gameOver = true;
+                    Debug.Log("killllll");
                 }
             }
         }

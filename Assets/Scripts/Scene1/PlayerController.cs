@@ -59,9 +59,10 @@ public class PlayerController : MonoBehaviour
 
     [Header("UI")]
     [SerializeField]private UIManager _uiManager;
+
+    public bool _isFrozen = false;
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
         
         this._cam = Camera.main;
         if(this._cam == null)
@@ -114,6 +115,12 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(_isFrozen)
+        {
+            if(_stepsSource.enabled)
+                _stepsSource.enabled = false;
+            return;
+        }
         CheckGrounded();
         HandleCameraInput();
         HandleMovement();
