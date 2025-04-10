@@ -378,7 +378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a325d72320fb9754d9bbecc4390221ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _moveSpeed: 6.5
+  _moveSpeed: 7
   _minDistanceToPos: 0.2
   _timeToStartMoving: 20
   _delayBeforeRandomMove: 1
@@ -394,7 +394,7 @@ MonoBehaviour:
   _layerToHit:
     serializedVersion: 2
     m_Bits: 192
-  _raySize: 3.5
+  _raySize: 4
   _animator: {fileID: 341385780}
   _baseSpeedAnim: 0.7
   _audioSourceLaugh: {fileID: 341385782}
@@ -891,8 +891,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9636b05e8a46d6444b76ff546d812f03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridWidth: 100
-  gridHeight: 100
+  gridWidth: 60
+  gridHeight: 60
   defaultWallPrefab: {fileID: 2679374810126417030, guid: ed72a865a01dbdc43a0aec8503a1ab64, type: 3}
   itemsPrefab: {fileID: 7410479796564971801, guid: 17a3e057fa4a3614b8ed028f7d30c97a, type: 3}
   renderProbability: 100
@@ -904,7 +904,7 @@ MonoBehaviour:
   numberOfFakeGoals: 50
   mapMaterial: {fileID: 2100000, guid: 8f314becaaca0be42bca7892e88501d0, type: 2}
   itemsPosition: []
-  _amountOfItems: 25
+  _amountOfItems: 10
   _playerTransform: {fileID: 660295914}
   _enemyTransform: {fileID: 341385781}
   _portalTransform: {fileID: 1603505901}
@@ -2112,7 +2112,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6573056380766149971, guid: 01256665d9ba55348ad5dc3f3f1f36ab, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 01256665d9ba55348ad5dc3f3f1f36ab, type: 3}
