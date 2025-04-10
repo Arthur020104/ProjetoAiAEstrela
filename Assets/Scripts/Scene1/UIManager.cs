@@ -98,7 +98,7 @@ public class UIManager : MonoBehaviour
         if(playerItems == _amountOfItems)
         {
             _portal.SetActive(true);
-            ShowText("Portal aberto, siga o som para poder escapar.");
+            ShowText("Saida aberta, siga o som para poder escapar.");
         }
     }
 

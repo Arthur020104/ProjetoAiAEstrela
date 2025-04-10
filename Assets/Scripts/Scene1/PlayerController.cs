@@ -75,15 +75,20 @@ public class PlayerController : MonoBehaviour
         }
         HandleCameraInput();
         HandleMovement();
-
-        // Command AI to move to player's position
+        LocateItems();
+        CollectItem();
+        HandleAudio();
+    }
+    void LocateItems()
+    {
         if(Input.GetKeyDown(KeyCode.F) && _AIScript != null)
         {
             _AIScript.GoTo(new Vector2(Mathf.RoundToInt(transform.position.x), Mathf.RoundToInt(transform.position.z)));
             SpawnTrailsToTargets(_trailPrefab, transform.position);
         }
-        
-        // Item pickup functionality
+    }
+    void CollectItem()
+    {
         if(Input.GetKeyDown(KeyCode.E))
         {
             Collider[] items = Physics.OverlapSphere(transform.position, _pickupItemRadius, _itemInteractionLayer);
@@ -92,13 +97,10 @@ public class PlayerController : MonoBehaviour
                 _mapGen.itemsPosition.Remove(new Vector2(Mathf.RoundToInt(item.transform.position.x), Mathf.RoundToInt(item.transform.position.z)));
                 Destroy(item.gameObject);
                 _itemCount++;
-                Debug.Log($"Got item, item count: {_itemCount}");
                 _uiManager.UpdateItemCount(_itemCount);
             }
         }
-        HandleAudio();
     }
-
     // Manages footstep sounds based on player movement speed
     void HandleAudio()
     {

@@ -1478,6 +1478,8 @@ GameObject:
   - component: {fileID: 1116792823}
   - component: {fileID: 1116792822}
   - component: {fileID: 1116792821}
+  - component: {fileID: 1116792825}
+  - component: {fileID: 1116792824}
   m_Layer: 0
   m_Name: Portal
   m_TagString: Untagged
@@ -1575,49 +1577,20 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1116792819}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1269351127 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2679374810126417030, guid: ed72a865a01dbdc43a0aec8503a1ab64, type: 3}
-  m_PrefabInstance: {fileID: 2116507240}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1603505901 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1575822196457614052, guid: ed72a865a01dbdc43a0aec8503a1ab64, type: 3}
-  m_PrefabInstance: {fileID: 2116507240}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1603505902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1269351127}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d87b5b746a6a21c428bc87da79e69ad5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _castRayFrom: {fileID: 1116792820}
-  _playerTransform: {fileID: 660295914}
-  _raySize: 1
-  _layerToHit:
-    serializedVersion: 2
-    m_Bits: 128
-  _timeToRayCast: 0.1
---- !u!82 &1603505906
+--- !u!82 &1116792824
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1269351127}
+  m_GameObject: {fileID: 1116792819}
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: e5cd5d250548b914ab180364db483d5b, type: 3}
   m_Resource: {fileID: 8300000, guid: e5cd5d250548b914ab180364db483d5b, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.075
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -1701,6 +1674,35 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1116792825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1116792819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d87b5b746a6a21c428bc87da79e69ad5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _castRayFrom: {fileID: 1116792820}
+  _playerTransform: {fileID: 660295914}
+  _raySize: 0.2
+  _layerToHit:
+    serializedVersion: 2
+    m_Bits: 128
+  _timeToRayCast: 0.1
+--- !u!1 &1269351127 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2679374810126417030, guid: ed72a865a01dbdc43a0aec8503a1ab64, type: 3}
+  m_PrefabInstance: {fileID: 2116507240}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1603505901 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1575822196457614052, guid: ed72a865a01dbdc43a0aec8503a1ab64, type: 3}
+  m_PrefabInstance: {fileID: 2116507240}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1979945327 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3719395497478071722, guid: 149914faacece2940a120e1783c4c6a9, type: 3}
@@ -1769,13 +1771,7 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1575822196457614052, guid: ed72a865a01dbdc43a0aec8503a1ab64, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1116792820}
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 2679374810126417030, guid: ed72a865a01dbdc43a0aec8503a1ab64, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1603505902}
-    - targetCorrespondingSourceObject: {fileID: 2679374810126417030, guid: ed72a865a01dbdc43a0aec8503a1ab64, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1603505906}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ed72a865a01dbdc43a0aec8503a1ab64, type: 3}
 --- !u!1 &2135485980
 GameObject:

@@ -112,9 +112,12 @@ public class MapGenerator : MonoBehaviour
     {
         // Create fake goals
         int counter = 0;
-        Vector3 fakeStartPos = new Vector3(inicialFakePos.x, 0, inicialFakePos.y);//To make sure at least one fake pos starts at 0,0
+        Vector3 playerStartPos = new Vector3(inicialFakePos.x, 0, inicialFakePos.y);
+        Vector3 fakeStartPos = playerStartPos;
         while (counter < numberOfFakeGoals)
         {
+            if(counter % 2 == 0)// Half of the fake goals should start at the player position
+                fakeStartPos = playerStartPos;
             Vector3 fakeGoalPos = new Vector3(Random.Range((int)1, (int)gridWidth - 1), wallYPosition , Random.Range(1, (int)gridHeight - 1));
             counter++;
             GeneratePath(fakeStartPos, fakeGoalPos);

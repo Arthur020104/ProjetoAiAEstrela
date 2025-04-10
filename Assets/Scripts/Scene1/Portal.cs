@@ -25,11 +25,9 @@ public class Portal : MonoBehaviour
         {
             _timer = _timeToRayCast;
             Vector3 direction = (_playerTransform.position - _castRayFrom.position).normalized;
-            Debug.Log("Casting");
             RaycastHit hitInfo;
             if (Physics.Raycast(_castRayFrom.position, direction, out hitInfo, _raySize, _layerToHit))
             {
-                Debug.Log("hit a");
                 if (hitInfo.collider.CompareTag("Player"))
                 {
                     Debug.Log("hit player");
