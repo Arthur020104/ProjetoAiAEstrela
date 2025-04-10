@@ -74,7 +74,6 @@ public class AI : Mover
         _lastSawPlayer = Time.time;
         _lastSawPosition = new Vector2(-1, -1);
         _maxTargetAngleDeviationCos = Mathf.Cos(_maxTargetAngleDeviation * Mathf.Deg2Rad);
-        Debug.Log(_maxTargetAngleDeviationCos);
         StartCoroutine(FreezeForSeconds(_timeToStartMoving));
     }
     IEnumerator FreezeForSeconds(float duration)
@@ -191,7 +190,6 @@ public class AI : Mover
                     _isFrozen = true;
                     
                     _uiManager.gameOver = true;
-                    Debug.Log("killllll");
                 }
             }
         }

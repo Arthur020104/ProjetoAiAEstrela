@@ -380,12 +380,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveSpeed: 7
   _minDistanceToPos: 0.2
-  _timeToStartMoving: 20
+  _timeToStartMoving: 25
   _delayBeforeRandomMove: 1
   _timeToDisregardPlayerPosition: 60
   _maxDistanceToWalkFromLastSawPos: 20
   _minDistanceToWalkFromLastSawPos: 3
-  _maxTargetAngleDeviation: 10
+  _maxTargetAngleDeviation: 20
   _killPlayerDistance: 1.5
   _playerPos: {fileID: 660295914}
   _head: {fileID: 1979945327}
@@ -394,7 +394,7 @@ MonoBehaviour:
   _layerToHit:
     serializedVersion: 2
     m_Bits: 192
-  _raySize: 4
+  _raySize: 5
   _animator: {fileID: 341385780}
   _baseSpeedAnim: 0.7
   _audioSourceLaugh: {fileID: 341385782}
@@ -690,10 +690,10 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 4e40aa886c274924c95ba5751bb898aa, type: 3}
-  m_Resource: {fileID: 8300000, guid: 4e40aa886c274924c95ba5751bb898aa, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 71c40287059c9cb45b50c200a860bb93, type: 3}
+  m_Resource: {fileID: 8300000, guid: 71c40287059c9cb45b50c200a860bb93, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.7
+  m_Volume: 0.8
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -787,8 +787,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 7d08ca651e19a3d4994c44fb05dec0d5, type: 3}
-  m_Resource: {fileID: 8300000, guid: 7d08ca651e19a3d4994c44fb05dec0d5, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 986bd43f785d1e5409aa8edff2162f16, type: 3}
+  m_Resource: {fileID: 8300000, guid: 986bd43f785d1e5409aa8edff2162f16, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -1032,8 +1032,8 @@ MonoBehaviour:
   _enemyTransform: {fileID: 341385781}
   _audioSourceTenseBuildUp: {fileID: 488307842}
   _minimalDistanceToPlayTenseMusic: 28
-  _buildUpStep: 4
-  _maxVolume: 1
+  _buildUpStep: 2
+  _maxVolume: 0.5
   _minVolume: 0.2
 --- !u!82 &488307842
 AudioSource:
@@ -2059,6 +2059,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2385668596822484115, guid: 01256665d9ba55348ad5dc3f3f1f36ab, type: 3}
+      propertyPath: m_SlopeLimit
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 2770052409256462870, guid: 01256665d9ba55348ad5dc3f3f1f36ab, type: 3}
       propertyPath: m_Name
       value: Player
