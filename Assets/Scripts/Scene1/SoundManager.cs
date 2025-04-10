@@ -46,7 +46,7 @@ public class SoundManager : MonoBehaviour
         if (distance <= _minimalDistanceToPlayTenseMusic)
         {
             float pitchFactor = 1 - ((distance - _minimalDistanceToPlayTenseMusic) / _buildUpStep) * 0.1f;
-            _targetPitch = Mathf.Clamp(pitchFactor, 0.8f, 1.6f);
+            _targetPitch = Mathf.Clamp(pitchFactor, 0.8f, 2.0f);
             
             // Calculate volume - closer = louder
             float volumeFactor = 1 - (distance / _minimalDistanceToPlayTenseMusic);
