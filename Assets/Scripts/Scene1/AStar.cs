@@ -29,6 +29,7 @@ namespace AStarPath
                 return x.GetHashCode() ^ y.GetHashCode();
             }
         }
+        // Usando o retorno de Stack<(int, int)> para facilitar percorrer do caminho. O primeiro passo de movimento é sempre o último adicionado à pilha, então ele se torna o primeiro para o deslocamento.
         public static Stack<(int,int)> AStarPathfinding(Vector2 start, Vector2 target, MapGenerator map)
         {
             if (map.IsBlocked((int)target.x, (int)target.y))
@@ -40,7 +41,7 @@ namespace AStarPath
             Dictionary<(int, int), Node> openNodes = new Dictionary<(int, int), Node>();
             Dictionary<(int, int), Node> closedNodes = new Dictionary<(int, int), Node>();
 
-            // Adding starting node as the initial path for the IA.
+            // Adicionando o nó inicial como o caminho inicial para a IA.
             AddOrReplace(openNodes, new Node((int)start.x, (int)start.y, 0, 0, 0, null));
 
             while (openNodes.Count > 0)
@@ -50,15 +51,10 @@ namespace AStarPath
                 openNodes.Remove(currentKey);
                 AddOrReplace(closedNodes, currentNode);
 
-                //Debug.Log($"On node {currentNode.x}, {currentNode.y}, open list size {openNodes.Count}");
-
                 if (currentNode.x == (int)target.x && currentNode.y == (int)target.y)
                 {
-                    //Debug.Log("Found it");
                     return CreatePath();
-                    
                 }
-                //LogNodesMatrix(closedNodes, openNodes); //To debug
                 for (int i = -1; i <= 1; i++)
                 {
                     for (int j = -1; j <= 1; j++)
@@ -72,40 +68,46 @@ namespace AStarPath
                         int nextY = (int)currentNode.y + j;
                         var coordinateKey = (nextX, nextY);
 
-                        // Skip blocked cells.
+                        // Ignorar células bloqueadas.
                         if (map.IsBlocked(nextX, nextY))
-                        {
                             continue;
+
+                        // Verificação especial para movimentos diagonais
+                        // Como o mapa é feito de quadrados, os movimentos diagonais são impossíveis se os vizinhos
+                        // adjacentes (relativos ao movimento diagonal) estiverem bloqueados
+                        if(Mathf.Abs(i) == 1 && Mathf.Abs(j) == 1)
+                        {
+                            var neighborsI = (currentNode.x+ i, currentNode.y);
+                            var neighborsJ = (currentNode.x, currentNode.y + j);
+                            if(map.IsBlocked(neighborsI.Item1, neighborsI.Item2) || map.IsBlocked(neighborsJ.Item1, neighborsJ.Item2))
+                                continue;
                         }
 
-                        // Calculate costs for the neighbor.
+                        // Calcular custos para o vizinho.
                         int gCost = currentNode.g + CalculateMovementCost(0, 0, i, j);
                         int hCost = CalculateMovementCost((int)target.x, (int)target.y, nextX, nextY);
                         int fCost = gCost + hCost;
 
-                        // Check closed list.
+                        // Verificar lista fechada.
                         if (closedNodes.TryGetValue(coordinateKey, out Node closedNode) && fCost >= closedNode.f)
                         {
-                            //Debug.Log($"Ignoring node {nextX}, {nextY} from closed list");
                             continue;
                         }
 
-                        // Check open list.
+                        // Verificar lista aberta.
                         if (openNodes.TryGetValue(coordinateKey, out Node openNode) && fCost >= openNode.f)
                         {
-                            //Debug.Log($"Ignoring node {nextX}, {nextY} from open list");
                             continue;
                         }
 
-                        // If we've gotten here, either the neighbor isn't in open/closed,
-                        // or we found a better path. Add or update it.
+                        // Se chegamos aqui, ou o vizinho não está em aberto/fechado,
+                        // ou encontramos um caminho melhor. Adicionar ou atualizar.
                         AddOrReplace(openNodes, new Node(nextX, nextY, gCost, hCost, fCost, currentNode));
-
                     }
                 }
             }
 
-            // Local function to reconstruct the path
+            // Função reconstruir o caminho do destino até o ponto inicial
             Stack<(int,int)> CreatePath()
             {
                 var currentKey = ((int)target.x, (int)target.y);
@@ -118,14 +120,12 @@ namespace AStarPath
                     throw new System.Exception("Path creation failed.");
                 }
 
-                // Traverse back from the target node to the start node
-                while (node != null && (node.x != (int)start.x || node.y != (int)start.y))
+                // Percorrer de volta do nó de destino até o nó inicial
+                while (node != null)
                 {
                     pathStack.Push((node.x, node.y));
                     node = node.parent;
                 }
-                // Push the start node
-                pathStack.Push(((int)start.x, (int)start.y));
 
                 return pathStack;
             }
@@ -134,60 +134,16 @@ namespace AStarPath
             return null;
         }
         
-        // To Debug to Current Step in the algorithm
-        static void LogNodesMatrix(Dictionary<(int, int), Node> closedNodes, Dictionary<(int, int), Node> openNodes)
-        {
-            
-            int minX = int.MaxValue, maxX = int.MinValue, minY = int.MaxValue, maxY = int.MinValue;
-            foreach (var dict in new[] { closedNodes, openNodes })
-            {
-                foreach (var key in dict.Keys)
-                {
-                    if (key.Item1 < minX) minX = key.Item1;
-                    if (key.Item1 > maxX) maxX = key.Item1;
-                    if (key.Item2 < minY) minY = key.Item2;
-                    if (key.Item2 > maxY) maxY = key.Item2;
-                }
-            }
-
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("----- Nodes Matrix -----");
-            
-            for (int y = maxY; y >= minY; y--)
-            {
-                for (int x = minX; x <= maxX; x++)
-                {
-                    (int, int) coord = (x, y);
-                    if (closedNodes.TryGetValue(coord, out Node closedNode))
-                    {
-                        // Format: C(g,h,f)
-                        sb.Append($" C(g:{closedNode.g},h:{closedNode.h},f:{closedNode.f})\t");
-                    }
-                    else if (openNodes.TryGetValue(coord, out Node openNode))
-                    {
-                        // Format: O(g,h,f)
-                        sb.Append($" O(g:{openNode.g},h:{openNode.h},f:{openNode.f})\t");
-                    }
-                    else
-                    {
-                        sb.Append(" ------ \t");
-                    }
-                }
-                sb.AppendLine();
-            }
-
-            Debug.Log(sb.ToString());
-        }
-
-
-        // Calculates the cost (distance) between two points using a diagonal movement cost of 14 and straight cost of 10.
+        // A heurística é o cálculo do custo (distância) entre dois pontos usando um custo de movimento diagonal de 14 e um custo de movimento reto de 10.
+        // Basicamente, representa o custo de 1 e sqrt(2) para movimentos diagonais, apenas multiplicado por 10 para simplificar.
+        // Prioriza movimentos diagonais porque eles cobrem uma maior distância em um único passo, tornando o caminho mais eficiente.
         static int CalculateMovementCost(int x1, int y1, int x2, int y2)
         {
             int deltaX = Mathf.Abs(x1 - x2);
             int deltaY = Mathf.Abs(y1 - y2);
             int cost = 0;
 
-            // Calculate diagonal movement cost
+            // Calcular custo de movimento diagonal
             while (deltaX > 0 && deltaY > 0)
             {
                 cost += 14;
@@ -195,14 +151,14 @@ namespace AStarPath
                 deltaY--;
             }
 
-            // Add the cost for remaining straight moves
+            // Adicionar o custo para os movimentos retos restantes
             cost += 10 * deltaX;
             cost += 10 * deltaY;
 
             return cost;
         }
 
-        // Adds a new node to the dictionary or replaces an existing node if the new one has a lower total cost.
+        // Adiciona um novo nó ao dicionário ou substitui um nó existente se o novo tiver um custo total menor.
         static void AddOrReplace(Dictionary<(int, int), Node> nodeDict, Node newNode)
         {
             var key = (newNode.x, newNode.y);
@@ -219,7 +175,7 @@ namespace AStarPath
             }
         }
 
-        // Finds the node with the lowest total cost (f value) in the dictionary.
+        // Encontra o nó com o menor custo total (valor f) no dicionário.
         static Node GetNodeWithLowestFScore(Dictionary<(int, int), Node> nodeDict)
         {
             if (nodeDict == null)
